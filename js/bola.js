@@ -1,4 +1,5 @@
-class Bola {
+class Bola 
+{
     constructor(puntPosicio, radi) {
         this.radi = radi;
         this.posicio = puntPosicio;
@@ -19,7 +20,8 @@ class Bola {
         this.posicio.x += x;
         this.posicio.y += y;
     }
-    update(){
+    update(canvas, pala, totxo)
+    {
 
         let puntActual = this.posicio;
         let puntSeguent= new Punt(this.posicio.x + this.vx,
@@ -30,22 +32,55 @@ class Bola {
         
 
         //Xoc amb els laterals del canvas
-        //Xoc lateral superior
-        if(trajectoria.puntB.y - this.radi < 0){
-            exces= (trajectoria.puntB.y - this.radi)/this.vy;
-            this.posicio.x = trajectoria.puntB.x - exces*this.vx;
-            this.posicio.y = this.radi;
-            xoc = true;
-            this.vy = -this.vy;
+        // Rebote Techo
+        if (trajectoria.puntB.y - this.radi < 0) {
+        exces = (trajectoria.puntB.y - this.radi) / this.vy;
+        this.posicio.x = trajectoria.puntB.x - exces * this.vx;
+        this.posicio.y = this.radi;
+        this.vy = -this.vy;
+        xoc = true;
         }
-        //Xoc lateral dret
-        //Xoc lateral esquerra
+        // Rebote Pared Derecha
+        else if (trajectoria.puntB.x + this.radi > canvas.width) {
+        exces = (trajectoria.puntB.x + this.radi - canvas.width) / this.vx;
+        this.posicio.y = trajectoria.puntB.y - exces * this.vy;
+        this.posicio.x = canvas.width - this.radi;
+        this.vx = -this.vx;
+        xoc = true;
+        }
+        // Rebote Pared Izquierda
+        else if (trajectoria.puntB.x - this.radi < 0) {
+        exces = (trajectoria.puntB.x - this.radi) / this.vx;
+        this.posicio.y = trajectoria.puntB.y - exces * this.vy;
+        this.posicio.x = this.radi;
+        this.vx = -this.vx;
+        xoc = true;
+        }
+    
         //Xoc lateral inferior
+        //en teoria si choca con la parte de abajo del canvas , lo q esta por debajo de la pala, pues se pierde
       
         //Xoc amb la pala
 
         //Xoc amb els totxos del mur
         //Utilitzem el mètode INTERSECCIOSEGMENTRECTANGLE
+
+        // let colisio = this.interseccioSegmentRectangle(trajectories, pala) || this.interseccioSegmentRectangle(trajectories, totxo);
+
+        // if (colisio) 
+        //     {
+        //         this.posicio = colisio.pI;
+    
+        //         if (colisio.voraI === "superior" || colisio.voraI === "inferior") 
+        //         {
+        //             this.vy = -this.vy;
+        //         } 
+        //         else 
+        //         {
+        //             this.vx = -this.vx;
+        //         }
+        //         xoc = true;
+        //     }
         
 
         if (!xoc){

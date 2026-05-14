@@ -50,7 +50,7 @@ class Joc{
     }
 
     update(){
-        this.bola.update();
+        this.bola.update(this.canvas, this.pala, this.totxo);
         this.pala.update();
         this.draw();       
 
