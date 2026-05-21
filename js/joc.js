@@ -45,6 +45,7 @@ class Joc{
         $(document).on("keyup", {joc:this}, function(e){
             //Moviment de la pala
         });
+        
 
         
     }

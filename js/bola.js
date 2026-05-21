@@ -48,6 +48,7 @@ class Bola
         this.vx = -this.vx;
         xoc = true;
         }
+        
         // Rebote Pared Izquierda
         else if (trajectoria.puntB.x - this.radi < 0) {
         exces = (trajectoria.puntB.x - this.radi) / this.vx;
@@ -65,22 +66,22 @@ class Bola
         //Xoc amb els totxos del mur
         //Utilitzem el mètode INTERSECCIOSEGMENTRECTANGLE
 
-        // let colisio = this.interseccioSegmentRectangle(trajectories, pala) || this.interseccioSegmentRectangle(trajectories, totxo);
+        let colisio = this.interseccioSegmentRectangle(trajectoria, pala) || this.interseccioSegmentRectangle(trajectoria, totxo);
 
-        // if (colisio) 
-        //     {
-        //         this.posicio = colisio.pI;
+        if (colisio) 
+            {
+                this.posicio = colisio.pI;
     
-        //         if (colisio.voraI === "superior" || colisio.voraI === "inferior") 
-        //         {
-        //             this.vy = -this.vy;
-        //         } 
-        //         else 
-        //         {
-        //             this.vx = -this.vx;
-        //         }
-        //         xoc = true;
-        //     }
+                if (colisio.voraI === "superior" || colisio.voraI === "inferior") 
+                {
+                    this.vy = -this.vy;
+                } 
+                else 
+                {
+                    this.vx = -this.vx;
+                }
+                xoc = true;
+            }
         
 
         if (!xoc){
@@ -91,33 +92,37 @@ class Bola
     }
 
     interseccioSegmentRectangle(segment, rectangle){
-
-       //1r REVISAR SI EXISTEIX UN PUNT D'INTERSECCIÓ EN UN DELS 4 SEGMENTS
-       //SI EXISTEIX, QUIN ÉS AQUEST PUNT
-       //si hi ha més d'un, el més ajustat
        let puntI;
        let distanciaI;
        let puntIMin;
        let distanciaIMin = Infinity;
        let voraI;
 
-       //calcular punt d'intersecció amb les 4 vores del rectangle
+       //1r calcular punt d'intersecció amb les 4 vores del rectangle
        //necessitem coneixer els 4 segments del rectangle
-       //vora superior
-       let segmentVoraSuperior = new  Segment(rectangle.posicio,
+       
+       //vora superior (esta ya venía de fábrica)
+       let segmentVoraSuperior = new Segment(rectangle.posicio,
            new Punt(rectangle.posicio.x + rectangle.amplada, rectangle.posicio.y));
-       //vora inferior
+       
+       //vora inferior (completada)
+       let segmentVoraInferior = new Segment(new Punt(rectangle.posicio.x, rectangle.posicio.y + rectangle.alcada),
+           new Punt(rectangle.posicio.x + rectangle.amplada, rectangle.posicio.y + rectangle.alcada));
       
-       //vora esquerra
+       //vora esquerra (completada)
+       let segmentVoraEsquerra = new Segment(rectangle.posicio,
+           new Punt(rectangle.posicio.x, rectangle.posicio.y + rectangle.alcada));
       
-       //vora dreta
+       //vora dreta (completada)
+       let segmentVoraDreta = new Segment(new Punt(rectangle.posicio.x + rectangle.amplada, rectangle.posicio.y),
+           new Punt(rectangle.posicio.x + rectangle.amplada, rectangle.posicio.y + rectangle.alcada));
       
 
        //2n REVISAR SI EXISTEIX UN PUNT D'INTERSECCIÓ EN UN DELS 4 SEGMENTS
        //SI EXISTEIX, QUIN ÉS AQUEST PUNT
-       //si hi ha més d'n, el més ajustat
+       //si hi ha més d'un, el més ajustat
     
-       //vora superior
+       //vora superior (esta ya venía de fábrica)
        puntI = segment.puntInterseccio(segmentVoraSuperior);
        if (puntI){
            //distancia entre dos punts, el punt inicial del segment i el punt d'intersecció
@@ -128,16 +133,45 @@ class Bola
                voraI = "superior";
            }
        }
-       //vora inferior
        
-       //vora esquerra
+       //vora inferior (completada siguiendo el mismo patrón)
+       puntI = segment.puntInterseccio(segmentVoraInferior);
+       if (puntI){
+           distanciaI = Punt.distanciaDosPunts(segment.puntA,puntI);
+           if (distanciaI < distanciaIMin){
+               distanciaIMin = distanciaI;
+               puntIMin = puntI;
+               voraI = "inferior";
+           }
+       }
+       
+       //vora esquerra (completada siguiendo el mismo patrón)
+       puntI = segment.puntInterseccio(segmentVoraEsquerra);
+       if (puntI){
+           distanciaI = Punt.distanciaDosPunts(segment.puntA,puntI);
+           if (distanciaI < distanciaIMin){
+               distanciaIMin = distanciaI;
+               puntIMin = puntI;
+               voraI = "esquerra";
+           }
+       }
       
-       //vora dreta
+       //vora dreta (completada siguiendo el mismo patrón)
+       puntI = segment.puntInterseccio(segmentVoraDreta);
+       if (puntI){
+           distanciaI = Punt.distanciaDosPunts(segment.puntA,puntI);
+           if (distanciaI < distanciaIMin){
+               distanciaIMin = distanciaI;
+               puntIMin = puntI;
+               voraI = "dreta";
+           }
+       }
        
-       //Retorna la vora on s'ha produït la col·lisió, i el punt (x,y)
-       if(voraI){
+       //Retorna la vora i el punt si existeix col·lisió
+       if (voraI){
            return {pI: puntIMin, vora: voraI};
        }
+       return null;
     }
 
     distancia = function(p1,p2){
